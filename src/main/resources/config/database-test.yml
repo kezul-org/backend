@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    # TestContainers가 자동으로 URL, username, password를 주입합니다.
+    # @ServiceConnection 어노테이션이 이 값들을 오버라이드하므로 여기선 비워둡니다.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect

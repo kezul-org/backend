@@ -1,0 +1,9 @@
+spring:
+  config:
+    import:
+      - classpath:config/database-test.yml
+  flyway:
+    locations: classpath:db/migration
+  test:
+    database:
+      replace: none  # H2가 클래스패스에 있어도 자동으로 교체하지 않도록 강제

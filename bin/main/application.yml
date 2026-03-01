@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: kezul-backend
+  threads:
+    virtual:
+      enabled: true  # Java 21+ Virtual Threads 활성화
+  jpa:
+    open-in-view: false  # OSIV 비활성화 (성능 이슈 방지)
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: health, info, modulith
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Kezul Backend
+    description: Kezul API Server

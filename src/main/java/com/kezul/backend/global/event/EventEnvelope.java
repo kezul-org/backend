@@ -1,5 +1,6 @@
 package com.kezul.backend.global.event;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.core.ResolvableType;
@@ -41,13 +42,14 @@ public record EventEnvelope<T extends DomainEvent>(
      * 
      * @param type    이벤트 종류
      * @param payload 실제 데이터 객체
+     * @param clock   글로벌 타임존 설정이 적용된 스프링 Clock 빈
      * @param <T>     DomainEvent
      * @return EventEnvelope 인스턴스
      */
-    public static <T extends DomainEvent> EventEnvelope<T> wrap(EventType type, T payload) {
+    public static <T extends DomainEvent> EventEnvelope<T> wrap(EventType type, T payload, Clock clock) {
         return new EventEnvelope<>(
                 UUID.randomUUID().toString(),
-                LocalDateTime.now(), // [KEZ-26] 글로벌 타임존 이슈 시 Clock 기반으로 변경 예정
+                LocalDateTime.now(clock), // [KEZ-26] 시스템에 주입된 글로벌 타임존 Clock 기반으로 시간 할당 완료
                 type,
                 payload);
     }

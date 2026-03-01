@@ -10,21 +10,29 @@ import org.slf4j.Logger;
 @Slf4j
 public final class AppLog {
 
+    public static final String CACHE_KEY = "cacheKey";
+    public static final String CACHE_HIT = "cacheHit";
+    public static final String API = "api";
+    public static final String STATUS_CODE = "statusCode";
+    public static final String DURATION_MS = "durationMs";
+    public static final String JOB = "job";
+    public static final String PROCESSED_COUNT = "processedCount";
+
     private AppLog() {
     }
 
     public static void cacheResult(Logger log, String key, boolean hit) {
         log.atDebug()
-                .addKeyValue("cacheKey", key)
-                .addKeyValue("cacheHit", hit)
+                .addKeyValue(CACHE_KEY, key)
+                .addKeyValue(CACHE_HIT, hit)
                 .log("Cache lookup");
     }
 
     public static void externalApi(Logger log, String apiName, int statusCode, long durationMs) {
         log.atInfo()
-                .addKeyValue("api", apiName)
-                .addKeyValue("statusCode", statusCode)
-                .addKeyValue("durationMs", durationMs)
+                .addKeyValue(API, apiName)
+                .addKeyValue(STATUS_CODE, statusCode)
+                .addKeyValue(DURATION_MS, durationMs)
                 .log("External API call completed");
     }
 
@@ -34,9 +42,9 @@ public final class AppLog {
     public static void externalApiError(Logger log, String apiName,
             int statusCode, long durationMs, Throwable cause) {
         log.atWarn()
-                .addKeyValue("api", apiName)
-                .addKeyValue("statusCode", statusCode)
-                .addKeyValue("durationMs", durationMs)
+                .addKeyValue(API, apiName)
+                .addKeyValue(STATUS_CODE, statusCode)
+                .addKeyValue(DURATION_MS, durationMs)
                 .setCause(cause)
                 .log("External API call failed");
     }
@@ -44,9 +52,9 @@ public final class AppLog {
     public static void schedulerCompleted(Logger log, String jobName,
             int processedCount, long durationMs) {
         log.atInfo()
-                .addKeyValue("job", jobName)
-                .addKeyValue("processedCount", processedCount)
-                .addKeyValue("durationMs", durationMs)
+                .addKeyValue(JOB, jobName)
+                .addKeyValue(PROCESSED_COUNT, processedCount)
+                .addKeyValue(DURATION_MS, durationMs)
                 .log("Scheduler job completed");
     }
 }

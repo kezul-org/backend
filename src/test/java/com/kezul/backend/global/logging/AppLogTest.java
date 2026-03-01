@@ -33,8 +33,8 @@ class AppLogTest {
         // Assert cacheResult
         assertThat(output.getOut())
                 .contains("DEBUG")
-                .contains("cacheKey=\"" + key + "\"")
-                .contains("cacheHit=\"" + hit + "\"")
+                .contains(AppLog.CACHE_KEY + "=\"" + key + "\"")
+                .contains(AppLog.CACHE_HIT + "=\"" + hit + "\"")
                 .contains("Cache lookup");
     }
 
@@ -52,9 +52,9 @@ class AppLogTest {
         // then
         assertThat(output.getOut())
                 .contains("INFO")
-                .contains("api=\"" + apiName + "\"")
-                .contains("statusCode=\"" + statusCode + "\"")
-                .contains("durationMs=\"" + durationMs + "\"")
+                .contains(AppLog.API + "=\"" + apiName + "\"")
+                .contains(AppLog.STATUS_CODE + "=\"" + statusCode + "\"")
+                .contains(AppLog.DURATION_MS + "=\"" + durationMs + "\"")
                 .contains("External API call completed");
     }
 
@@ -73,9 +73,9 @@ class AppLogTest {
         // then
         assertThat(output.getOut())
                 .contains("WARN")
-                .contains("api=\"" + apiName + "\"")
-                .contains("statusCode=\"" + statusCode + "\"")
-                .contains("durationMs=\"" + durationMs + "\"")
+                .contains(AppLog.API + "=\"" + apiName + "\"")
+                .contains(AppLog.STATUS_CODE + "=\"" + statusCode + "\"")
+                .contains(AppLog.DURATION_MS + "=\"" + durationMs + "\"")
                 .contains("External API call failed")
                 .contains("java.lang.RuntimeException: Timeout occurred");
     }
@@ -94,9 +94,9 @@ class AppLogTest {
         // then
         assertThat(output.getOut())
                 .contains("INFO")
-                .contains("job=\"" + jobName + "\"")
-                .contains("processedCount=\"" + processedCount + "\"")
-                .contains("durationMs=\"" + durationMs + "\"")
+                .contains(AppLog.JOB + "=\"" + jobName + "\"")
+                .contains(AppLog.PROCESSED_COUNT + "=\"" + processedCount + "\"")
+                .contains(AppLog.DURATION_MS + "=\"" + durationMs + "\"")
                 .contains("Scheduler job completed");
     }
 }

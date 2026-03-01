@@ -553,3 +553,4 @@ src/main/resources/config/aws-prod.yml
 .gradle/
 .idea/
 build/
+!gradle/wrapper/gradle-wrapper.jar

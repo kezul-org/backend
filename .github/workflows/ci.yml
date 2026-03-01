@@ -10,33 +10,36 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  test-and-build:
+    name: Test & Build (Java 25)
     runs-on: ubuntu-latest
-    
-    # Needs to be updated depending on the chosen platform (Node.js, Spring Boot, etc.)
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      
-      # Example Placeholder: Setup Node.js (Uncomment later if Node.js)
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
-      #     cache: 'npm'
 
-      # Example Placeholder: Setup Java (Uncomment later if Spring Boot)
-      # - name: Setup Java
-      #   uses: actions/setup-java@v4
-      #   with:
-      #     distribution: 'corretto'
-      #     java-version: '17'
+      - name: Setup Java 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
 
-      - name: Lint Placeholder
-        run: echo "Run linter here depending on the language"
-      
-      - name: Test Placeholder
-        run: echo "Run tests here depending on the language"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Placeholder
-        run: echo "Run build here depending on the language"
+      - name: Run Tests (TestContainers)
+        run: ./gradlew test --no-daemon
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      - name: Build (skip tests)
+        run: ./gradlew build -x test --no-daemon
+        if: success()
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: build/reports/tests/test/
+          retention-days: 7

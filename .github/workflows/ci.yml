@@ -1,0 +1,42 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    # Needs to be updated depending on the chosen platform (Node.js, Spring Boot, etc.)
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # Example Placeholder: Setup Node.js (Uncomment later if Node.js)
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20'
+      #     cache: 'npm'
+
+      # Example Placeholder: Setup Java (Uncomment later if Spring Boot)
+      # - name: Setup Java
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     distribution: 'corretto'
+      #     java-version: '17'
+
+      - name: Lint Placeholder
+        run: echo "Run linter here depending on the language"
+      
+      - name: Test Placeholder
+        run: echo "Run tests here depending on the language"
+
+      - name: Build Placeholder
+        run: echo "Run build here depending on the language"

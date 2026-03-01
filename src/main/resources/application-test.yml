@@ -1,0 +1,7 @@
+spring:
+  config:
+    import:
+      - classpath:config/database-test.yml
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true

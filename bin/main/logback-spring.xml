@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ══ local / test : 컬러 콘솔 ══════════════════════════════════════ -->
+    <springProfile name="local,test">
+
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>
+                    %d{HH:mm:ss.SSS} %highlight(%-5level) %cyan([%15.15thread]) %yellow([%X{traceId:-}]) %green(%-40.40logger{39}) : %msg%n
+                </pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="org.springframework"   level="INFO"/>
+        <logger name="org.hibernate"         level="INFO"/>
+        <logger name="org.hibernate.SQL"     level="INFO"/>  <!-- SQL 확인 필요 시 DEBUG -->
+        <logger name="com.zaxxer.hikari"     level="INFO"/>
+        <logger name="org.flywaydb"          level="INFO"/>
+        <logger name="org.testcontainers"    level="INFO"/>
+        <logger name="com.github.dockerjava" level="WARN"/>
+        <logger name="io.micrometer"         level="INFO"/>
+
+    </springProfile>
+
+
+    <!-- ══ prod : JSON 구조화 + 비동기 Rolling ═══════════════════════════
+         활성화: SPRING_PROFILES_ACTIVE=prod java -jar app.jar
+         ══════════════════════════════════════════════════════════════════ -->
+    <springProfile name="prod">
+
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/app.log</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- 날짜별 롤링 + gz 압축. 예: logs/app.2026-03-01.0.log.gz -->
+                <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <maxHistory>30</maxHistory>      <!-- 30일 보관 -->
+                <totalSizeCap>10GB</totalSizeCap> <!-- 전체 최대 용량 -->
+                <maxFileSize>100MB</maxFileSize>  <!-- 파일 하나당 최대 크기 -->
+            </rollingPolicy>
+
+            <!--
+              LogstashEncoder: JSON 한 줄 출력.
+              micrometer-tracing-brave가 MDC에 주입한 traceId/spanId 자동 포함.
+            -->
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <message>message</message>
+                    <logger>logger</logger>
+                    <thread>thread</thread>
+                    <level>level</level>
+                    <stackTrace>stackTrace</stackTrace>
+                </fieldNames>
+            </encoder>
+        </appender>
+
+        <!--
+          AsyncAppender: 요청 처리 스레드가 파일 I/O를 직접 기다리지 않도록 분리.
+          discardingThreshold=0 → 큐가 차도 로그 드롭 안 함.
+        -->
+        <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>512</queueSize>
+            <includeCallerData>false</includeCallerData>
+            <appender-ref ref="FILE"/>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="ASYNC_FILE"/>
+        </root>
+
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate.SQL"   level="WARN"/>
+        <logger name="org.flywaydb"        level="WARN"/>
+        <logger name="io.micrometer"       level="WARN"/>
+
+    </springProfile>
+
+</configuration>

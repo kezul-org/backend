@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    # @ServiceConnection이 TestContainers MySQL의
+    # URL, username, password, driver-class-name을 모두 자동 주입합니다.
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect

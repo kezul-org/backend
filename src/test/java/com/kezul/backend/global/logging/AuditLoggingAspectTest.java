@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = AuditLoggingAspectTest.TestConfig.class)
+@ActiveProfiles("test")
 @ExtendWith(OutputCaptureExtension.class)
 class AuditLoggingAspectTest {
 

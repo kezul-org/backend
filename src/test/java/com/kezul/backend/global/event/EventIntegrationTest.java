@@ -56,7 +56,7 @@ class EventIntegrationTest {
         DummyEvent dummy = new DummyEvent(1L, "Sanghoon Sync");
 
         // when
-        Events.raise(EventEnvelope.wrap(EventType.USER_CREATED, dummy));
+        Events.raise(EventType.USER_CREATED, dummy);
 
         // then
         assertThat(testListener.getSyncReceivedName()).isEqualTo("Sanghoon Sync");
@@ -67,7 +67,8 @@ class EventIntegrationTest {
     void asyncEventPublishTest(Scenario scenario) {
         // given
         DummyEvent dummy = new DummyEvent(2L, "Sanghoon Async");
-        EventEnvelope<DummyEvent> envelope = EventEnvelope.wrap(EventType.USER_CREATED, dummy);
+        EventEnvelope<DummyEvent> envelope = EventEnvelope.wrap(EventType.USER_CREATED, dummy,
+                java.time.Clock.systemUTC());
 
         // when & then
         // Scenario 기능을 통해 해당 이벤트가 @ApplicationModuleListener로 정상 전달/처리되었음을 완료 시점까지 대기하며

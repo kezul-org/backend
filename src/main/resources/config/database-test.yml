@@ -1,8 +1,7 @@
 spring:
   datasource:
-    # TestContainers가 자동으로 URL, username, password를 주입합니다.
-    # @ServiceConnection 어노테이션이 이 값들을 오버라이드하므로 여기선 비워둡니다.
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # @ServiceConnection이 TestContainers MySQL의
+    # URL, username, password, driver-class-name을 모두 자동 주입합니다.
   jpa:
     hibernate:
       ddl-auto: validate

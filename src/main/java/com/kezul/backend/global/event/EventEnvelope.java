@@ -7,9 +7,20 @@ import org.springframework.core.ResolvableTypeProvider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 도메인 이벤트 데이터 본문에 공통 메타데이터(발생 시간, 고유 ID, 종류)를 더하는 봉투(Envelope) 객체.
+ * 도메인 이벤트의 알맹이({@link DomainEvent})에 공통 기술 메타데이터를 덧붙이는 봉투(Envelope) 객체입니다.
+ * <p>
+ * 이벤트 발생 시점, 고유 식별자, 이벤트 종류 등 인프라스트럭처 레벨에서 필요한 공통 정보들을
+ * 실제 비즈니스 도메인 객체(Payload)와 분리하여 관리하기 위해 사용됩니다.
+ * <p>
+ * {@link ResolvableTypeProvider}를 구현하여, 제네릭 타입 {@code <T>}가 런타임에 소거되더라도
+ * Spring ApplicationEventPublisher가 이벤트 리스너의 제네릭 타입을 정확하게 유추하여 라우팅할 수 있도록
+ * 지원합니다.
  * 
- * @param <T> DomainEvent 를 구현한 실제 페이로드 객체
+ * @param eventId 이벤트의 고유 식별자 (디버깅, 멱등성 검증, 메시지 추적 용도)
+ * @param time    이벤트가 실제 발생한 런타임 시각 (글로벌 서비스 시 TimeZone 동기화의 기준점)
+ * @param type    이벤트의 종류를 나타내는 명시적 Enum 값
+ * @param payload 실제 비즈니스 데이터를 담고 있는 도메인 이벤트 객체
+ * @param <T>     {@link DomainEvent}를 구현한 실제 페이로드 클래스 타입
  */
 public record EventEnvelope<T extends DomainEvent>(
         String eventId, // 이벤트 고유 식별자 리퍼런스 (디버깅 / 멱등성 목적)

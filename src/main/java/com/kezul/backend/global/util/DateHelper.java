@@ -3,6 +3,8 @@ package com.kezul.backend.global.util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,17 +21,20 @@ import java.time.DayOfWeek;
 public class DateHelper {
 
     private final LocalTime cutoffTime;
+    private final Clock clock;
     public static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     /**
-     * @param cutoffHour 기준 시간 (app.daily-cutoff-hour, 기본값 0)
+     * @param cutoffHour 애플리케이션 속성 `app.daily-cutoff-hour`에서 값을 읽어오며, 기본값은 0(자정)입니다.
+     * @param clock      시스템 전역 Clock 빈 — 테스트 시 Clock.fixed()로 교체 가능
      */
-    public DateHelper(@Value("${app.daily-cutoff-hour:0}") int cutoffHour) {
+    public DateHelper(@Value("${app.daily-cutoff-hour:0}") int cutoffHour, Clock clock) {
         this.cutoffTime = LocalTime.of(cutoffHour, 0);
+        this.clock = clock;
     }
 
     /* ========================================================================= */
-    /* 1. 단순 기간 산출                                                           */
+    /* 1. 단순 기간 산출 */
     /* ========================================================================= */
 
     /**
@@ -76,9 +81,10 @@ public class DateHelper {
 
     /**
      * "지금 현재" 클라이언트 타임존 기준으로 오늘(자정 기준) 하루 전체의 UTC 범위를 구합니다.
+     * Clock 빈을 통해 현재 시각을 결정하므로 테스트 시 시간 고정이 가능합니다.
      */
-    public static TimePeriod getTodayPeriod(ZoneId clientZone) {
-        LocalDate todayInClientZone = ZonedDateTime.now(UTC_ZONE).withZoneSameInstant(clientZone).toLocalDate();
+    public TimePeriod getTodayPeriod(ZoneId clientZone) {
+        LocalDate todayInClientZone = ZonedDateTime.now(clock).withZoneSameInstant(clientZone).toLocalDate();
         return getDailyPeriod(todayInClientZone, clientZone);
     }
 
@@ -90,7 +96,7 @@ public class DateHelper {
     }
 
     /* ========================================================================= */
-    /* 2. 비즈니스 컷오프(Cut-off) 정책 연동 메서드                                   */
+    /* 2. 비즈니스 컷오프(Cut-off) 정책 연동 메서드 */
     /* ========================================================================= */
 
     /**
@@ -107,9 +113,10 @@ public class DateHelper {
 
     /**
      * "지금 현재" 클라이언트 지역의 비즈니스 하루 전체 UTC 범위 반환.
+     * Clock 빈을 통해 현재 시각을 결정하므로 테스트 시 시간 고정이 가능합니다.
      */
     public TimePeriod getBusinessTodayPeriod(ZoneId clientZone) {
-        return getBusinessDailyPeriod(ZonedDateTime.now(UTC_ZONE), clientZone);
+        return getBusinessDailyPeriod(ZonedDateTime.now(clock), clientZone);
     }
 
     /**

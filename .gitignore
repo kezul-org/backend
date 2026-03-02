@@ -162,7 +162,8 @@ replay_pid*
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -275,6 +276,7 @@ web_modules/
 # Next.js build output
 .next
 out
+!src/**/out/
 
 # Nuxt.js build / generate output
 .nuxt

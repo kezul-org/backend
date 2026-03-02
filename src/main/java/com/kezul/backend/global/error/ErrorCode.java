@@ -82,4 +82,13 @@ public enum ErrorCode {
 
     /** 응답에 사용할 HTTP 상태 코드 */
     private final HttpStatus httpStatus;
+
+    /**
+     * 다국어(i18n) 처리를 위한 프로퍼티 파일 메시지 키 반환 (예: "error.C001")
+     *
+     * @return messages.properties 등에 정의된 에러 키
+     */
+    public String getMessageKey() {
+        return "error." + this.code;
+    }
 }

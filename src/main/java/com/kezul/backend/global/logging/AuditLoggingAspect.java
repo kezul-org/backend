@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * {@link Audit} 어노테이션이 붙은 메서드의 감사 로그를 자동 처리하는 Aspect.
- * 메서드 시작/완료/실패를 구조화 로그로 기록하며, 실패 시 예외를 다시 던져
- * {@link com.kezul.backend.global.error.GlobalExceptionHandler}가 응답을 처리하도록 합니다.
+ * @Audit 어노테이션 메서드의 실행 전/후/예외 감사 로그를 남기는 Aspect.
  */
 @Slf4j
 @Aspect

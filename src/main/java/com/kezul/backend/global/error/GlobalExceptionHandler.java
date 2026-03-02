@@ -73,21 +73,29 @@ public class GlobalExceptionHandler {
         public ResponseEntity<CommonResponse<Void>> handleValidationException(
                         MethodArgumentNotValidException ex) {
                 String traceId = MDC.get("traceId");
+                ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+
+                String defaultI18nMessage = messageSource.getMessage(
+                                errorCode.getMessageKey(),
+                                null,
+                                errorCode.getMessage(),
+                                LocaleContextHolder.getLocale());
+
                 String errorMessage = ex.getBindingResult()
                                 .getFieldErrors()
                                 .stream()
                                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                                 .findFirst()
-                                .orElse(ErrorCode.INVALID_INPUT_VALUE.getMessage());
+                                .orElse(defaultI18nMessage);
 
                 log.atWarn()
-                                .addKeyValue("errorCode", ErrorCode.INVALID_INPUT_VALUE.getCode())
+                                .addKeyValue("errorCode", errorCode.getCode())
                                 .addKeyValue("violations", ex.getBindingResult().getErrorCount())
                                 .log("Validation failed: {}", errorMessage);
 
                 return ResponseEntity
-                                .status(ErrorCode.INVALID_INPUT_VALUE.getHttpStatus())
-                                .body(CommonResponse.fail(ErrorCode.INVALID_INPUT_VALUE, errorMessage, traceId));
+                                .status(errorCode.getHttpStatus())
+                                .body(CommonResponse.fail(errorCode.getCode(), errorMessage, traceId));
         }
 
         /**

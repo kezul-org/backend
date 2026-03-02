@@ -3,6 +3,8 @@ package com.kezul.backend.global.error;
 import com.kezul.backend.global.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +32,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+        private final MessageSource messageSource;
+
+        public GlobalExceptionHandler(MessageSource messageSource) {
+                this.messageSource = messageSource;
+        }
+
         /**
          * 비즈니스 예외 처리.
          * 서비스 레이어에서 {@link AppException}을 던지면 이 메서드가 처리합니다.
@@ -38,6 +46,12 @@ public class GlobalExceptionHandler {
         public ResponseEntity<CommonResponse<Void>> handleAppException(AppException ex) {
                 ErrorCode errorCode = ex.getErrorCode();
                 String traceId = MDC.get("traceId");
+
+                String i18nMessage = messageSource.getMessage(
+                                errorCode.getMessageKey(),
+                                null,
+                                errorCode.getMessage(),
+                                LocaleContextHolder.getLocale());
 
                 log.atError()
                                 .addKeyValue("errorCode", errorCode.getCode())
@@ -48,7 +62,7 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                                 .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode, traceId));
+                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
         }
 
         /**
@@ -83,15 +97,22 @@ public class GlobalExceptionHandler {
         public ResponseEntity<CommonResponse<Void>> handleMethodNotAllowed(
                         HttpRequestMethodNotSupportedException ex) {
                 String traceId = MDC.get("traceId");
+                ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+
+                String i18nMessage = messageSource.getMessage(
+                                errorCode.getMessageKey(),
+                                null,
+                                errorCode.getMessage(),
+                                LocaleContextHolder.getLocale());
 
                 log.atWarn()
-                                .addKeyValue("errorCode", ErrorCode.METHOD_NOT_ALLOWED.getCode())
+                                .addKeyValue("errorCode", errorCode.getCode())
                                 .addKeyValue("method", ex.getMethod())
                                 .log("Method not allowed");
 
                 return ResponseEntity
-                                .status(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus())
-                                .body(CommonResponse.fail(ErrorCode.METHOD_NOT_ALLOWED, traceId));
+                                .status(errorCode.getHttpStatus())
+                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
         }
 
         /**
@@ -101,15 +122,22 @@ public class GlobalExceptionHandler {
         public ResponseEntity<CommonResponse<Void>> handleNoResourceFound(
                         NoResourceFoundException ex) {
                 String traceId = MDC.get("traceId");
+                ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
+
+                String i18nMessage = messageSource.getMessage(
+                                errorCode.getMessageKey(),
+                                null,
+                                errorCode.getMessage(),
+                                LocaleContextHolder.getLocale());
 
                 log.atWarn()
-                                .addKeyValue("errorCode", ErrorCode.RESOURCE_NOT_FOUND.getCode())
+                                .addKeyValue("errorCode", errorCode.getCode())
                                 .addKeyValue("path", ex.getResourcePath())
                                 .log("Resource not found");
 
                 return ResponseEntity
-                                .status(ErrorCode.RESOURCE_NOT_FOUND.getHttpStatus())
-                                .body(CommonResponse.fail(ErrorCode.RESOURCE_NOT_FOUND, traceId));
+                                .status(errorCode.getHttpStatus())
+                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
         }
 
         /**
@@ -118,15 +146,22 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         public ResponseEntity<CommonResponse<Void>> handleException(Exception ex) {
                 String traceId = MDC.get("traceId");
+                ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+
+                String i18nMessage = messageSource.getMessage(
+                                errorCode.getMessageKey(),
+                                null,
+                                errorCode.getMessage(),
+                                LocaleContextHolder.getLocale());
 
                 log.atError()
-                                .addKeyValue("errorCode", ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                                .addKeyValue("errorCode", errorCode.getCode())
                                 .addKeyValue("exceptionType", ex.getClass().getSimpleName())
                                 .setCause(ex)
                                 .log("Unexpected exception occurred");
 
                 return ResponseEntity
-                                .status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus())
-                                .body(CommonResponse.fail(ErrorCode.INTERNAL_SERVER_ERROR, traceId));
+                                .status(errorCode.getHttpStatus())
+                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
         }
 }

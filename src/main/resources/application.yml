@@ -1,6 +1,10 @@
 spring:
   application:
     name: kezul-backend
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false  # 매칭되는 로케일이 없으면 기본(messages.properties) 사용
   threads:
     virtual:
       enabled: true  # Java 21+ Virtual Threads 활성화

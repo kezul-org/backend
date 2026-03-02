@@ -80,4 +80,17 @@ public record CommonResponse<T>(
     public static <T> CommonResponse<T> fail(ErrorCode errorCode, String message, String traceId) {
         return new CommonResponse<>(false, null, errorCode.getCode(), message, traceId);
     }
+
+    /**
+     * 다국어(i18n) 처리가 완료된 코드와 메시지로 실패 응답을 생성합니다.
+     *
+     * @param code    발생한 에러의 코드 문자열 (예: "U001")
+     * @param message 다국어 처리가 완료된 에러 메시지
+     * @param traceId 추적을 위한 ID
+     * @param <T>     데이터 타입 (실패 시 null)
+     * @return 실패 응답
+     */
+    public static <T> CommonResponse<T> fail(String code, String message, String traceId) {
+        return new CommonResponse<>(false, null, code, message, traceId);
+    }
 }

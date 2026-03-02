@@ -13,11 +13,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.DayOfWeek;
 
 /**
- * 클라이언트의 타임존(ZoneId)과 날짜를 기반으로, 서버 DB 조회용 UTC 기준 범위(TimePeriod)를 계산해 주는 유틸리티
- * 컴포넌트입니다.
- * <p>
- * 글로벌 서비스의 베스트 프랙티스에 따라, DB에는 무조건 UTC만을 저장하고,
- * 읽기 전용 쿼리를 날릴 때 클라이언트의 타임존에 맞춰 검색 범위를 UTC로 치환합니다.
+ * 클라이언트 타임존(ZoneId) 기반 UTC 조회 범위(TimePeriod) 산출 유틸리티.
  */
 @Component
 public class DateHelper {
@@ -26,14 +22,14 @@ public class DateHelper {
     public static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     /**
-     * @param cutoffHour 애플리케이션 속성 `app.daily-cutoff-hour`에서 값을 읽어오며, 기본값은 0(자정)입니다.
+     * @param cutoffHour 기준 시간 (app.daily-cutoff-hour, 기본값 0)
      */
     public DateHelper(@Value("${app.daily-cutoff-hour:0}") int cutoffHour) {
         this.cutoffTime = LocalTime.of(cutoffHour, 0);
     }
 
     /* ========================================================================= */
-    /* 1. 단순 기간 산출 (Cutoff 없이 순수 달력 기준 자정 00:00:00) */
+    /* 1. 단순 기간 산출                                                           */
     /* ========================================================================= */
 
     /**
@@ -94,7 +90,7 @@ public class DateHelper {
     }
 
     /* ========================================================================= */
-    /* 2. 비즈니스 컷오프(Cut-off) 정책 연동 메서드 (예: 새벽 4시를 하루 기준으로 삼을 때) */
+    /* 2. 비즈니스 컷오프(Cut-off) 정책 연동 메서드                                   */
     /* ========================================================================= */
 
     /**

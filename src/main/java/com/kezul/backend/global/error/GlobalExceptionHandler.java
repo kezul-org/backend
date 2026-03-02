@@ -13,20 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * 애플리케이션 전역 예외 처리기.
- *
- * <p>
- * 모든 컨트롤러에서 던져진 예외를 이 한 곳에서 잡아 처리합니다.
- * 비즈니스 코드에서 직접 에러 로그를 남기지 않고, 이 클래스에서 일괄 로깅합니다.
- *
- * <p>
- * 처리 흐름:
- * <ol>
- * <li>예외 발생 → 핸들러 메서드 진입</li>
- * <li>SLF4J 2.0 Fluent API로 구조화 로그 기록 (traceId/spanId 자동 포함)</li>
- * <li>MDC에서 traceId를 꺼내 에러 응답에 포함</li>
- * <li>{@link CommonResponse#fail}으로 통일된 에러 응답 반환</li>
- * </ol>
+ * 전역 예외를 캐치하여 로깅하고 일관된 CommonResponse 포맷으로 반환하는 핸들러.
  */
 @Slf4j
 @RestControllerAdvice
@@ -39,8 +26,7 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * 비즈니스 예외 처리.
-         * 서비스 레이어에서 {@link AppException}을 던지면 이 메서드가 처리합니다.
+         * 비즈니스 예외 처리
          */
         @ExceptionHandler(AppException.class)
         public ResponseEntity<CommonResponse<Void>> handleAppException(AppException ex) {
@@ -66,8 +52,7 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * Bean Validation 실패 예외 처리.
-         * {@code @Valid} 어노테이션이 붙은 요청 본문/파라미터의 유효성 검사가 실패하면 발생합니다.
+         * Bean Validation 예외 처리
          */
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<CommonResponse<Void>> handleValidationException(
@@ -99,7 +84,7 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * 지원하지 않는 HTTP 메서드 요청 예외 처리.
+         * 지원하지 않는 HTTP 메서드 예외 처리
          */
         @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
         public ResponseEntity<CommonResponse<Void>> handleMethodNotAllowed(
@@ -124,7 +109,7 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * 존재하지 않는 URL 요청 예외 처리.
+         * 존재하지 않는 URL(리소스) 요청 예외 처리
          */
         @ExceptionHandler(NoResourceFoundException.class)
         public ResponseEntity<CommonResponse<Void>> handleNoResourceFound(
@@ -149,7 +134,7 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * 위의 핸들러로 처리되지 않은 모든 예외의 최후 방어선.
+         * 최상위 예외 처리 (최후 방어선)
          */
         @ExceptionHandler(Exception.class)
         public ResponseEntity<CommonResponse<Void>> handleException(Exception ex) {

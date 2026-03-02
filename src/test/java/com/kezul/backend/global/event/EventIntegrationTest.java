@@ -11,10 +11,11 @@ import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.modulith.test.Scenario;
 import org.springframework.stereotype.Component;
 
+import com.kezul.backend.IntegrationTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ApplicationModuleTest
-@SpringBootTest
+@IntegrationTest
 @Import(EventIntegrationTest.TestListener.class)
 class EventIntegrationTest {
 

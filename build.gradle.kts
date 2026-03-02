@@ -27,7 +27,7 @@ repositories {
 extra["springModulithVersion"] = "2.0.3"
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-h2console")
+
 	implementation("org.springframework.boot:spring-boot-micrometer-tracing-brave")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -42,7 +42,7 @@ dependencies {
 	implementation("org.springframework.modulith:spring-modulith-starter-core")
 	implementation("org.springframework.modulith:spring-modulith-starter-jpa")
 	compileOnly("org.projectlombok:lombok")
-	runtimeOnly("com.h2database:h2")
+
 	runtimeOnly("com.mysql:mysql-connector-j")
 	runtimeOnly("org.springframework.modulith:spring-modulith-actuator")
 	runtimeOnly("org.springframework.modulith:spring-modulith-observability")

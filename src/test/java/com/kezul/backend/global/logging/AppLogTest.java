@@ -8,13 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import com.kezul.backend.IntegrationTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@IntegrationTest
 @ExtendWith(OutputCaptureExtension.class)
 class AppLogTest {
 

@@ -279,7 +279,9 @@ class DateHelperTest {
             // KST 3/1 00:00 = UTC 2/28 15:00
             // KST 3/3 끝 = KST 3/4 00:00 - 1ns → UTC 3/3 14:59:59.999...
             TimePeriod period = DateHelper.getPeriod(
-                    LocalDate.of(2026, 3, 1), LocalDate.of(2026, 3, 3), KST);
+                    LocalDate.of(2026, 3, 1),
+                    LocalDate.of(2026, 3, 3),
+                    KST);
 
             assertThat(period.startUtc()).isEqualTo(LocalDateTime.of(2026, 2, 28, 15, 0, 0));
             assertThat(period.endUtc()).isEqualTo(LocalDateTime.of(2026, 3, 3, 14, 59, 59, 999_999_999));
@@ -562,7 +564,9 @@ class DateHelperTest {
             DateHelper dateHelper = new DateHelper(4, Clock.systemUTC());
 
             TimePeriod period = dateHelper.getBusinessPeriod(
-                    LocalDate.of(2026, 3, 1), LocalDate.of(2026, 3, 3), KST);
+                    LocalDate.of(2026, 3, 1),
+                    LocalDate.of(2026, 3, 3),
+                    KST);
 
             // KST 3/1 04:00 = UTC 2/28 19:00
             // KST 3/4 04:00 - 1ns = UTC 3/3 18:59:59.999...
@@ -576,7 +580,9 @@ class DateHelperTest {
             DateHelper dateHelper = new DateHelper(0, Clock.systemUTC());
 
             TimePeriod businessPeriod = dateHelper.getBusinessPeriod(
-                    LocalDate.of(2026, 3, 3), LocalDate.of(2026, 3, 3), KST);
+                    LocalDate.of(2026, 3, 3),
+                    LocalDate.of(2026, 3, 3),
+                    KST);
             TimePeriod dailyPeriod = DateHelper.getDailyPeriod(LocalDate.of(2026, 3, 3), KST);
 
             assertThat(businessPeriod).isEqualTo(dailyPeriod);

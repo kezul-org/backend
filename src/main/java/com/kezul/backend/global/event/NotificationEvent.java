@@ -8,7 +8,7 @@ public interface NotificationEvent extends DomainEvent {
 
     /**
      * 알림을 수신할 대상 회원의 고유 ID를 반환해야 합니다.
-     * 
+     *
      * @return 알림 수신 대상 UserId
      */
     Long getTargetUserId();

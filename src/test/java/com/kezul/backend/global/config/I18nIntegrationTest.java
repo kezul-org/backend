@@ -31,8 +31,9 @@ class I18nIntegrationTest {
     @Test
     @DisplayName("Accept-Language: ko 헤더로 요청 시 한국어 에러 메시지를 반환한다")
     void shouldReturnKoreanMessageWhenAcceptLanguageIsKo() throws Exception {
-        mockMvc.perform(get("/api/invalid-url")
-                .header("Accept-Language", "ko"))
+        mockMvc.perform(
+                get("/api/invalid-url")
+                        .header("Accept-Language", "ko"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("C003"))
@@ -42,8 +43,9 @@ class I18nIntegrationTest {
     @Test
     @DisplayName("Accept-Language: en 헤더로 요청 시 영어 에러 메시지를 반환한다")
     void shouldReturnEnglishMessageWhenAcceptLanguageIsEn() throws Exception {
-        mockMvc.perform(get("/api/invalid-url")
-                .header("Accept-Language", "en"))
+        mockMvc.perform(
+                get("/api/invalid-url")
+                        .header("Accept-Language", "en"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("C003"))

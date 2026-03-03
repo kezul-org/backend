@@ -22,8 +22,10 @@ public class Events {
     /**
      * 도메인 이벤트를 EventEnvelope으로 감싸 ApplicationContext에 발행합니다.
      *
-     * @param type    이벤트 종류
-     * @param payload 실제 이벤트 페이로드
+     * @param type
+     *            이벤트 종류
+     * @param payload
+     *            실제 이벤트 페이로드
      */
     public static <T extends DomainEvent> void raise(EventType type, T payload) {
         Assert.notNull(publisher, "ApplicationEventPublisher가 아직 등록되지 않았습니다.");
@@ -35,7 +37,8 @@ public class Events {
     /**
      * 생성된 EventEnvelope을 그대로 발행합니다. (테스트 및 내부 확장용)
      *
-     * @param eventEnvelope 이벤트 봉투 객체
+     * @param eventEnvelope
+     *            이벤트 봉투 객체
      */
     public static void raise(EventEnvelope<? extends DomainEvent> eventEnvelope) {
         Assert.notNull(publisher, "ApplicationEventPublisher가 아직 등록되지 않았습니다.");

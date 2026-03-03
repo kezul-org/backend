@@ -19,142 +19,142 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-        private final MessageSource messageSource;
+    private final MessageSource messageSource;
 
-        public GlobalExceptionHandler(MessageSource messageSource) {
-                this.messageSource = messageSource;
-        }
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
-        /**
-         * 비즈니스 예외 처리
-         */
-        @ExceptionHandler(AppException.class)
-        public ResponseEntity<CommonResponse<Void>> handleAppException(AppException ex) {
-                ErrorCode errorCode = ex.getErrorCode();
-                String traceId = MDC.get("traceId");
+    /**
+     * 비즈니스 예외 처리
+     */
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<CommonResponse<Void>> handleAppException(AppException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+        String traceId = MDC.get("traceId");
 
-                String i18nMessage = messageSource.getMessage(
-                                errorCode.getMessageKey(),
-                                null,
-                                errorCode.getMessage(),
-                                LocaleContextHolder.getLocale());
+        String i18nMessage = messageSource.getMessage(
+                errorCode.getMessageKey(),
+                null,
+                errorCode.getMessage(),
+                LocaleContextHolder.getLocale());
 
-                log.atError()
-                                .addKeyValue("errorCode", errorCode.getCode())
-                                .addKeyValue("errorMessage", errorCode.getMessage())
-                                .addKeyValue("httpStatus", errorCode.getHttpStatus().value())
-                                .setCause(ex)
-                                .log("Business exception occurred");
+        log.atError()
+                .addKeyValue("errorCode", errorCode.getCode())
+                .addKeyValue("errorMessage", errorCode.getMessage())
+                .addKeyValue("httpStatus", errorCode.getHttpStatus().value())
+                .setCause(ex)
+                .log("Business exception occurred");
 
-                return ResponseEntity
-                                .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
-        }
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
+    }
 
-        /**
-         * Bean Validation 예외 처리
-         */
-        @ExceptionHandler(MethodArgumentNotValidException.class)
-        public ResponseEntity<CommonResponse<Void>> handleValidationException(
-                        MethodArgumentNotValidException ex) {
-                String traceId = MDC.get("traceId");
-                ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+    /**
+     * Bean Validation 예외 처리
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CommonResponse<Void>> handleValidationException(
+            MethodArgumentNotValidException ex) {
+        String traceId = MDC.get("traceId");
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 
-                String defaultI18nMessage = messageSource.getMessage(
-                                errorCode.getMessageKey(),
-                                null,
-                                errorCode.getMessage(),
-                                LocaleContextHolder.getLocale());
+        String defaultI18nMessage = messageSource.getMessage(
+                errorCode.getMessageKey(),
+                null,
+                errorCode.getMessage(),
+                LocaleContextHolder.getLocale());
 
-                String errorMessage = ex.getBindingResult()
-                                .getFieldErrors()
-                                .stream()
-                                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-                                .findFirst()
-                                .orElse(defaultI18nMessage);
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .findFirst()
+                .orElse(defaultI18nMessage);
 
-                log.atWarn()
-                                .addKeyValue("errorCode", errorCode.getCode())
-                                .addKeyValue("violations", ex.getBindingResult().getErrorCount())
-                                .log("Validation failed: {}", errorMessage);
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode.getCode())
+                .addKeyValue("violations", ex.getBindingResult().getErrorCount())
+                .log("Validation failed: {}", errorMessage);
 
-                return ResponseEntity
-                                .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode.getCode(), errorMessage, traceId));
-        }
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.fail(errorCode.getCode(), errorMessage, traceId));
+    }
 
-        /**
-         * 지원하지 않는 HTTP 메서드 예외 처리
-         */
-        @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-        public ResponseEntity<CommonResponse<Void>> handleMethodNotAllowed(
-                        HttpRequestMethodNotSupportedException ex) {
-                String traceId = MDC.get("traceId");
-                ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+    /**
+     * 지원하지 않는 HTTP 메서드 예외 처리
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<CommonResponse<Void>> handleMethodNotAllowed(
+            HttpRequestMethodNotSupportedException ex) {
+        String traceId = MDC.get("traceId");
+        ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
 
-                String i18nMessage = messageSource.getMessage(
-                                errorCode.getMessageKey(),
-                                null,
-                                errorCode.getMessage(),
-                                LocaleContextHolder.getLocale());
+        String i18nMessage = messageSource.getMessage(
+                errorCode.getMessageKey(),
+                null,
+                errorCode.getMessage(),
+                LocaleContextHolder.getLocale());
 
-                log.atWarn()
-                                .addKeyValue("errorCode", errorCode.getCode())
-                                .addKeyValue("method", ex.getMethod())
-                                .log("Method not allowed");
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode.getCode())
+                .addKeyValue("method", ex.getMethod())
+                .log("Method not allowed");
 
-                return ResponseEntity
-                                .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
-        }
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
+    }
 
-        /**
-         * 존재하지 않는 URL(리소스) 요청 예외 처리
-         */
-        @ExceptionHandler(NoResourceFoundException.class)
-        public ResponseEntity<CommonResponse<Void>> handleNoResourceFound(
-                        NoResourceFoundException ex) {
-                String traceId = MDC.get("traceId");
-                ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
+    /**
+     * 존재하지 않는 URL(리소스) 요청 예외 처리
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<CommonResponse<Void>> handleNoResourceFound(
+            NoResourceFoundException ex) {
+        String traceId = MDC.get("traceId");
+        ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
 
-                String i18nMessage = messageSource.getMessage(
-                                errorCode.getMessageKey(),
-                                null,
-                                errorCode.getMessage(),
-                                LocaleContextHolder.getLocale());
+        String i18nMessage = messageSource.getMessage(
+                errorCode.getMessageKey(),
+                null,
+                errorCode.getMessage(),
+                LocaleContextHolder.getLocale());
 
-                log.atWarn()
-                                .addKeyValue("errorCode", errorCode.getCode())
-                                .addKeyValue("path", ex.getResourcePath())
-                                .log("Resource not found");
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode.getCode())
+                .addKeyValue("path", ex.getResourcePath())
+                .log("Resource not found");
 
-                return ResponseEntity
-                                .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
-        }
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
+    }
 
-        /**
-         * 최상위 예외 처리 (최후 방어선)
-         */
-        @ExceptionHandler(Exception.class)
-        public ResponseEntity<CommonResponse<Void>> handleException(Exception ex) {
-                String traceId = MDC.get("traceId");
-                ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+    /**
+     * 최상위 예외 처리 (최후 방어선)
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CommonResponse<Void>> handleException(Exception ex) {
+        String traceId = MDC.get("traceId");
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
-                String i18nMessage = messageSource.getMessage(
-                                errorCode.getMessageKey(),
-                                null,
-                                errorCode.getMessage(),
-                                LocaleContextHolder.getLocale());
+        String i18nMessage = messageSource.getMessage(
+                errorCode.getMessageKey(),
+                null,
+                errorCode.getMessage(),
+                LocaleContextHolder.getLocale());
 
-                log.atError()
-                                .addKeyValue("errorCode", errorCode.getCode())
-                                .addKeyValue("exceptionType", ex.getClass().getSimpleName())
-                                .setCause(ex)
-                                .log("Unexpected exception occurred");
+        log.atError()
+                .addKeyValue("errorCode", errorCode.getCode())
+                .addKeyValue("exceptionType", ex.getClass().getSimpleName())
+                .setCause(ex)
+                .log("Unexpected exception occurred");
 
-                return ResponseEntity
-                                .status(errorCode.getHttpStatus())
-                                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
-        }
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(CommonResponse.fail(errorCode.getCode(), i18nMessage, traceId));
+    }
 }

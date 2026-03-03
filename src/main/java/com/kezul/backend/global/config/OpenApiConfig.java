@@ -19,30 +19,31 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-        @Bean
-        public OpenAPI openAPI() {
-                SecurityScheme securityScheme = new SecurityScheme()
-                                .name("JWT")
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT");
+    @Bean
+    public OpenAPI openAPI() {
+        SecurityScheme securityScheme = new SecurityScheme()
+                .name("JWT")
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
 
-                SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT");
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT");
 
-                Components components = new Components()
-                                .addSecuritySchemes("JWT", securityScheme);
+        Components components = new Components()
+                .addSecuritySchemes("JWT", securityScheme);
 
-                List<Server> servers = List.of(
-                                new Server().url("http://localhost:8080").description("로컬 서버"),
-                                new Server().url("https://api-dev.kezul.com").description("개발(Dev) 서버"));
+        List<Server> servers = List.of(
+                new Server().url("http://localhost:8080").description("로컬 서버"),
+                new Server().url("https://api-dev.kezul.com").description("개발(Dev) 서버"));
 
-                return new OpenAPI()
-                                .info(new Info()
-                                                .title("Kezul API 명세서")
-                                                .description("Kezul 웹/앱 프론트엔드 연동을 위한 백엔드 REST API 문서입니다.")
-                                                .version("v1.0.0"))
-                                .servers(servers)
-                                .addSecurityItem(securityRequirement)
-                                .components(components);
-        }
+        return new OpenAPI()
+                .info(
+                        new Info()
+                                .title("Kezul API 명세서")
+                                .description("Kezul 웹/앱 프론트엔드 연동을 위한 백엔드 REST API 문서입니다.")
+                                .version("v1.0.0"))
+                .servers(servers)
+                .addSecurityItem(securityRequirement)
+                .components(components);
+    }
 }

@@ -17,8 +17,15 @@ public final class AppLog {
     public static final String DURATION_MS = "durationMs";
     public static final String JOB = "job";
     public static final String PROCESSED_COUNT = "processedCount";
+    public static final String USER_ID = "userId";
 
     private AppLog() {
+    }
+
+    public static void authReissued(Logger log, Long userId) {
+        log.atInfo()
+                .addKeyValue(USER_ID, userId)
+                .log("Token reissued successfully");
     }
 
     public static void cacheResult(Logger log, String key, boolean hit) {
@@ -39,8 +46,12 @@ public final class AppLog {
     /**
      * 외부 API 실패 기록. 이후 AppException으로 변환해서 던지세요.
      */
-    public static void externalApiError(Logger log, String apiName,
-            int statusCode, long durationMs, Throwable cause) {
+    public static void externalApiError(
+            Logger log,
+            String apiName,
+            int statusCode,
+            long durationMs,
+            Throwable cause) {
         log.atWarn()
                 .addKeyValue(API, apiName)
                 .addKeyValue(STATUS_CODE, statusCode)
@@ -49,8 +60,11 @@ public final class AppLog {
                 .log("External API call failed");
     }
 
-    public static void schedulerCompleted(Logger log, String jobName,
-            int processedCount, long durationMs) {
+    public static void schedulerCompleted(
+            Logger log,
+            String jobName,
+            int processedCount,
+            long durationMs) {
         log.atInfo()
                 .addKeyValue(JOB, jobName)
                 .addKeyValue(PROCESSED_COUNT, processedCount)

@@ -25,8 +25,10 @@ public class DateHelper {
     public static final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     /**
-     * @param cutoffHour 애플리케이션 속성 `app.daily-cutoff-hour`에서 값을 읽어오며, 기본값은 0(자정)입니다.
-     * @param clock      시스템 전역 Clock 빈 — 테스트 시 Clock.fixed()로 교체 가능
+     * @param cutoffHour
+     *            애플리케이션 속성 `app.daily-cutoff-hour`에서 값을 읽어오며, 기본값은 0(자정)입니다.
+     * @param clock
+     *            시스템 전역 Clock 빈 — 테스트 시 Clock.fixed()로 교체 가능
      */
     public DateHelper(@Value("${app.daily-cutoff-hour:0}") int cutoffHour, Clock clock) {
         this.cutoffTime = LocalTime.of(cutoffHour, 0);
@@ -46,8 +48,9 @@ public class DateHelper {
 
     /**
      * 특정 주(월~일)의 시작(UTC) ~ 종료(UTC) 반환.
-     * 
-     * @param dateInWeek 주간 내 어느 한 날짜
+     *
+     * @param dateInWeek
+     *            주간 내 어느 한 날짜
      */
     public static TimePeriod getWeeklyPeriod(LocalDate dateInWeek, ZoneId clientZone) {
         LocalDate startOfWeek = dateInWeek.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));

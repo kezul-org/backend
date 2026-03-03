@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  *
  * <p>
  * 사용 예시:
- * 
+ *
  * <pre>
  * {@code
  * @IntegrationTest

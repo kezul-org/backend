@@ -1,6 +1,8 @@
 spring:
   application:
     name: kezul-backend
+  profiles:
+    default: local  # 프로필이 명시되지 않으면 local로 동작 (CI/CD에서 SPRING_PROFILES_ACTIVE로 오버라이드)
   messages:
     basename: messages
     encoding: UTF-8

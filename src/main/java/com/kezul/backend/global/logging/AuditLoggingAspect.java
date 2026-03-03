@@ -60,7 +60,9 @@ public class AuditLoggingAspect {
         }
     }
 
-    private String resolveArgs(ProceedingJoinPoint pjp, boolean maskArgs,
+    private String resolveArgs(
+            ProceedingJoinPoint pjp,
+            boolean maskArgs,
             MethodSignature signature) {
         if (maskArgs) {
             return Arrays.stream(signature.getParameterTypes())

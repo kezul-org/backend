@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  * public PaymentResult pay(Long userId, PaymentRequest request) { ... }
  *
  * // 개인정보가 파라미터에 있을 경우 maskArgs = true
- * @Audit(event = AuditEvent.AUTH_LOGIN, maskArgs = true)
+ * &#64;Audit(event = AuditEvent.AUTH_LOGIN, maskArgs = true)
  * public LoginResult login(LoginRequest request) { ... }
  * }
  * </pre>

@@ -7,7 +7,8 @@ import com.kezul.backend.global.error.ErrorCode;
 /**
  * 모든 API 응답의 공통 래퍼(Wrapper).
  *
- * @param <T> 성공 응답 데이터 타입
+ * @param <T>
+ *            성공 응답 데이터 타입
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CommonResponse<T>(
@@ -21,8 +22,10 @@ public record CommonResponse<T>(
     /**
      * 데이터가 있는 성공 응답을 생성합니다.
      *
-     * @param data 응답 데이터
-     * @param <T>  데이터 타입
+     * @param data
+     *            응답 데이터
+     * @param <T>
+     *            데이터 타입
      * @return 성공 응답
      */
     public static <T> CommonResponse<T> success(T data) {
@@ -41,8 +44,10 @@ public record CommonResponse<T>(
     /**
      * {@link ErrorCode}를 기반으로 실패 응답을 생성합니다.
      *
-     * @param errorCode 발생한 에러 코드
-     * @param <T>       데이터 타입 (실패 시 null)
+     * @param errorCode
+     *            발생한 에러 코드
+     * @param <T>
+     *            데이터 타입 (실패 시 null)
      * @return 실패 응답
      */
     public static <T> CommonResponse<T> fail(ErrorCode errorCode, String traceId) {
@@ -53,9 +58,12 @@ public record CommonResponse<T>(
      * 에러 코드와 커스텀 메시지로 실패 응답을 생성합니다.
      * 유효성 검사 실패 등 에러 코드의 기본 메시지 대신 구체적인 메시지를 제공할 때 사용합니다.
      *
-     * @param errorCode 발생한 에러 코드
-     * @param message   클라이언트에 노출할 커스텀 메시지
-     * @param <T>       데이터 타입 (실패 시 null)
+     * @param errorCode
+     *            발생한 에러 코드
+     * @param message
+     *            클라이언트에 노출할 커스텀 메시지
+     * @param <T>
+     *            데이터 타입 (실패 시 null)
      * @return 실패 응답
      */
     public static <T> CommonResponse<T> fail(ErrorCode errorCode, String message, String traceId) {
@@ -65,10 +73,14 @@ public record CommonResponse<T>(
     /**
      * 다국어(i18n) 처리가 완료된 코드와 메시지로 실패 응답을 생성합니다.
      *
-     * @param code    발생한 에러의 코드 문자열 (예: "U001")
-     * @param message 다국어 처리가 완료된 에러 메시지
-     * @param traceId 추적을 위한 ID
-     * @param <T>     데이터 타입 (실패 시 null)
+     * @param code
+     *            발생한 에러의 코드 문자열 (예: "U001")
+     * @param message
+     *            다국어 처리가 완료된 에러 메시지
+     * @param traceId
+     *            추적을 위한 ID
+     * @param <T>
+     *            데이터 타입 (실패 시 null)
      * @return 실패 응답
      */
     public static <T> CommonResponse<T> fail(String code, String message, String traceId) {

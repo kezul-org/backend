@@ -24,7 +24,8 @@ public class AppException extends RuntimeException {
      * 에러 코드만으로 예외를 생성합니다.
      * 메시지는 {@link ErrorCode#getMessage()}를 기본값으로 사용합니다.
      *
-     * @param errorCode 발생한 비즈니스 에러의 종류
+     * @param errorCode
+     *            발생한 비즈니스 에러의 종류
      */
     public AppException(ErrorCode errorCode) {
         super(errorCode.getMessage());
@@ -35,8 +36,10 @@ public class AppException extends RuntimeException {
      * 에러 코드와 커스텀 메시지로 예외를 생성합니다.
      * 에러 코드의 기본 메시지 외에 추가 컨텍스트를 제공할 때 사용합니다.
      *
-     * @param errorCode 발생한 비즈니스 에러의 종류
-     * @param message   상세 에러 메시지 (로그에만 기록되며 클라이언트에는 노출되지 않음)
+     * @param errorCode
+     *            발생한 비즈니스 에러의 종류
+     * @param message
+     *            상세 에러 메시지 (로그에만 기록되며 클라이언트에는 노출되지 않음)
      */
     public AppException(ErrorCode errorCode, String message) {
         super(message);
@@ -47,8 +50,10 @@ public class AppException extends RuntimeException {
      * 에러 코드와 원인 예외로 예외를 생성합니다.
      * 외부 시스템 호출 실패 등 원인 예외를 래핑할 때 사용합니다.
      *
-     * @param errorCode 발생한 비즈니스 에러의 종류
-     * @param cause     원인이 된 예외 (스택 트레이스에 연결됨)
+     * @param errorCode
+     *            발생한 비즈니스 에러의 종류
+     * @param cause
+     *            원인이 된 예외 (스택 트레이스에 연결됨)
      */
     public AppException(ErrorCode errorCode, Throwable cause) {
         super(errorCode.getMessage(), cause);

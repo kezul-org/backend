@@ -67,7 +67,9 @@ class EventIntegrationTest {
     void asyncEventPublishTest(Scenario scenario) {
         // given
         DummyEvent dummy = new DummyEvent(2L, "Sanghoon Async");
-        EventEnvelope<DummyEvent> envelope = EventEnvelope.wrap(EventType.USER_CREATED, dummy,
+        EventEnvelope<DummyEvent> envelope = EventEnvelope.wrap(
+                EventType.USER_CREATED,
+                dummy,
                 java.time.Clock.systemUTC());
 
         // when & then

@@ -1,0 +1,7 @@
+app:
+  auth:
+    jwt:
+      issuer: "test.kezul.com"
+      secret-key: "t3st-s3cr3t-k3y-f0r-k3zul-auth-s3ss10n-b3st-pr4ct1c3-!"
+      access-token-expiration-minutes: 5
+      refresh-token-expiration-days: 1

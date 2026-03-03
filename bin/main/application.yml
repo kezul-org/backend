@@ -1,6 +1,17 @@
 spring:
   application:
     name: kezul-backend
+  profiles:
+    active: local
+
+app:
+  auth:
+    jwt:
+      issuer: "kezul.com"
+      secret-key: "v3ry-s3cr3t-k3y-f0r-k3zul-auth-s3ss10n-b3st-pr4ct1c3-!"
+      access-token-expiration-minutes: 30
+      refresh-token-expiration-days: 90
+
   messages:
     basename: messages
     encoding: UTF-8

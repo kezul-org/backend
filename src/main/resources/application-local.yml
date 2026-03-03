@@ -2,6 +2,7 @@ spring:
   config:
     import:
       - classpath:config/database-local.yml
+      - classpath:config/security-local.yml
   flyway:
     locations: classpath:db/migration
     baseline-on-migrate: true

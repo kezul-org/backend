@@ -1,5 +1,6 @@
-package com.kezul.backend.global.error;
+package com.kezul.backend.global.exception;
 
+import com.kezul.backend.global.logging.AppLog;
 import com.kezul.backend.global.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -28,8 +29,8 @@ public class GlobalExceptionHandler {
     /**
      * 비즈니스 예외 처리
      */
-    @ExceptionHandler(AppException.class)
-    public ResponseEntity<CommonResponse<Void>> handleAppException(AppException ex) {
+    @ExceptionHandler(KezulException.class)
+    public ResponseEntity<CommonResponse<Void>> handleKezulException(KezulException ex) {
         ErrorCode errorCode = ex.getErrorCode();
         String traceId = MDC.get("traceId");
 
@@ -39,12 +40,12 @@ public class GlobalExceptionHandler {
                 errorCode.getMessage(),
                 LocaleContextHolder.getLocale());
 
-        log.atError()
-                .addKeyValue("errorCode", errorCode.getCode())
-                .addKeyValue("errorMessage", errorCode.getMessage())
-                .addKeyValue("httpStatus", errorCode.getHttpStatus().value())
-                .setCause(ex)
-                .log("Business exception occurred");
+        AppLog.businessException(
+                log,
+                errorCode.getCode(),
+                errorCode.getMessage(),
+                errorCode.getHttpStatus().value(),
+                ex);
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CommonResponse<Void>> handleValidationException(
             MethodArgumentNotValidException ex) {
         String traceId = MDC.get("traceId");
-        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+        ErrorCode errorCode = GlobalErrorCode.INVALID_INPUT_VALUE;
 
         String defaultI18nMessage = messageSource.getMessage(
                 errorCode.getMessageKey(),
@@ -73,10 +74,7 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse(defaultI18nMessage);
 
-        log.atWarn()
-                .addKeyValue("errorCode", errorCode.getCode())
-                .addKeyValue("violations", ex.getBindingResult().getErrorCount())
-                .log("Validation failed: {}", errorMessage);
+        AppLog.validationFailed(log, errorCode.getCode(), ex.getBindingResult().getErrorCount(), errorMessage);
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -90,7 +88,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CommonResponse<Void>> handleMethodNotAllowed(
             HttpRequestMethodNotSupportedException ex) {
         String traceId = MDC.get("traceId");
-        ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+        ErrorCode errorCode = GlobalErrorCode.METHOD_NOT_ALLOWED;
 
         String i18nMessage = messageSource.getMessage(
                 errorCode.getMessageKey(),
@@ -98,10 +96,7 @@ public class GlobalExceptionHandler {
                 errorCode.getMessage(),
                 LocaleContextHolder.getLocale());
 
-        log.atWarn()
-                .addKeyValue("errorCode", errorCode.getCode())
-                .addKeyValue("method", ex.getMethod())
-                .log("Method not allowed");
+        AppLog.methodNotAllowed(log, errorCode.getCode(), ex.getMethod());
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -115,7 +110,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CommonResponse<Void>> handleNoResourceFound(
             NoResourceFoundException ex) {
         String traceId = MDC.get("traceId");
-        ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
+        ErrorCode errorCode = GlobalErrorCode.RESOURCE_NOT_FOUND;
 
         String i18nMessage = messageSource.getMessage(
                 errorCode.getMessageKey(),
@@ -123,10 +118,7 @@ public class GlobalExceptionHandler {
                 errorCode.getMessage(),
                 LocaleContextHolder.getLocale());
 
-        log.atWarn()
-                .addKeyValue("errorCode", errorCode.getCode())
-                .addKeyValue("path", ex.getResourcePath())
-                .log("Resource not found");
+        AppLog.resourceNotFound(log, errorCode.getCode(), ex.getResourcePath());
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -139,7 +131,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponse<Void>> handleException(Exception ex) {
         String traceId = MDC.get("traceId");
-        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = GlobalErrorCode.INTERNAL_SERVER_ERROR;
 
         String i18nMessage = messageSource.getMessage(
                 errorCode.getMessageKey(),
@@ -147,11 +139,7 @@ public class GlobalExceptionHandler {
                 errorCode.getMessage(),
                 LocaleContextHolder.getLocale());
 
-        log.atError()
-                .addKeyValue("errorCode", errorCode.getCode())
-                .addKeyValue("exceptionType", ex.getClass().getSimpleName())
-                .setCause(ex)
-                .log("Unexpected exception occurred");
+        AppLog.unhandledException(log, errorCode.getCode(), ex);
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())

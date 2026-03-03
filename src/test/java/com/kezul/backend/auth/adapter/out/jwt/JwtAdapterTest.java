@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.kezul.backend.auth.application.port.out.dto.TokenPair;
 import com.kezul.backend.auth.config.JwtProperties;
-import com.kezul.backend.global.error.AppException;
+import com.kezul.backend.auth.exception.AuthException;
 
 class JwtAdapterTest {
 
@@ -123,9 +123,9 @@ class JwtAdapterTest {
 
         // when & then
         assertThatThrownBy(() -> jwtAdapter.getUserId(invalidToken))
-                .isInstanceOf(AppException.class);
+                .isInstanceOf(AuthException.class);
 
         assertThatThrownBy(() -> jwtAdapter.getRole(invalidToken))
-                .isInstanceOf(AppException.class);
+                .isInstanceOf(AuthException.class);
     }
 }

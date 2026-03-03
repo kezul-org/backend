@@ -19,8 +19,8 @@ import com.kezul.backend.auth.application.port.out.JwtPort;
 import com.kezul.backend.auth.application.port.out.RefreshTokenPort;
 import com.kezul.backend.auth.application.port.out.dto.TokenPair;
 import com.kezul.backend.auth.domain.model.entity.RefreshToken;
-import com.kezul.backend.global.error.AppException;
-import com.kezul.backend.global.error.ErrorCode;
+import com.kezul.backend.auth.exception.AuthErrorCode;
+import com.kezul.backend.auth.exception.AuthException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -76,8 +76,8 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.reissue(command))
-                .isInstanceOf(AppException.class)
-                .hasMessageContaining(ErrorCode.INVALID_TOKEN.getMessage());
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining(AuthErrorCode.INVALID_TOKEN.getMessage());
     }
 
     @Test
@@ -90,8 +90,8 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.reissue(command))
-                .isInstanceOf(AppException.class)
-                .hasMessageContaining(ErrorCode.INVALID_TOKEN.getMessage());
+                .isInstanceOf(AuthException.class)
+                .hasMessageContaining(AuthErrorCode.INVALID_TOKEN.getMessage());
     }
 
     @Test

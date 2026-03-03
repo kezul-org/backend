@@ -1,0 +1,7 @@
+app:
+  auth:
+    jwt:
+      issuer: "dev.kezul.com"
+      secret-key: ${JWT_SECRET_KEY}
+      access-token-expiration-minutes: 30
+      refresh-token-expiration-days: 90

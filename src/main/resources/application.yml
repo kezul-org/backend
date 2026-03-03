@@ -1,8 +1,9 @@
 spring:
   application:
     name: kezul-backend
-  profiles:
-    active: local
+  # profiles.active는 여기에 절대 지정하지 않는다.
+  # 실행 환경(로컬/CI/CD)에서 SPRING_PROFILES_ACTIVE 환경변수 또는
+  # -Dspring.profiles.active=prod 인자로 지정한다.
   messages:
     basename: messages
     encoding: UTF-8

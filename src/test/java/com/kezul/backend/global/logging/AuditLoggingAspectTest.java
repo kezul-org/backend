@@ -104,7 +104,7 @@ class AuditLoggingAspectTest {
 
     @Configuration
     @EnableAspectJAutoProxy
-    @Import({ AuditLoggingAspect.class, DummyService.class })
+    @Import({AuditLoggingAspect.class, DummyService.class})
     static class TestConfig {
         // 필요한 빈만 등록하여 가벼운 컨텍스트 사용
     }

@@ -1,0 +1,7 @@
+{
+    "java.format.settings.url": ".vscode/eclipse-formatter.xml",
+    "[java]": {
+        "editor.formatOnSave": false,
+        "editor.wordWrap": "on"
+    }
+}

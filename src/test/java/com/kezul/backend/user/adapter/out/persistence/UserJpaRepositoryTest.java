@@ -53,7 +53,8 @@ class UserJpaRepositoryTest {
 
         // when
         Optional<User> found = userJpaRepository.findByOauthIdAndOauthProvider("apple_unique_123", OauthProvider.APPLE);
-        Optional<User> notFoundProvider = userJpaRepository.findByOauthIdAndOauthProvider("apple_unique_123",
+        Optional<User> notFoundProvider = userJpaRepository.findByOauthIdAndOauthProvider(
+                "apple_unique_123",
                 OauthProvider.KAKAO);
         Optional<User> notFoundId = userJpaRepository.findByOauthIdAndOauthProvider("wrong_id", OauthProvider.APPLE);
 

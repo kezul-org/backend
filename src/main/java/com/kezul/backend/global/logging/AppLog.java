@@ -17,8 +17,15 @@ public final class AppLog {
     public static final String DURATION_MS = "durationMs";
     public static final String JOB = "job";
     public static final String PROCESSED_COUNT = "processedCount";
+    public static final String USER_ID = "userId";
 
     private AppLog() {
+    }
+
+    public static void authReissued(Logger log, Long userId) {
+        log.atInfo()
+                .addKeyValue(USER_ID, userId)
+                .log("Token reissued successfully");
     }
 
     public static void cacheResult(Logger log, String key, boolean hit) {
@@ -37,10 +44,14 @@ public final class AppLog {
     }
 
     /**
-     * 외부 API 실패 기록. 이후 AppException으로 변환해서 던지세요.
+     * 외부 API 실패 기록. 이후 KezulException(또는 하위 예외)으로 변환해서 던지세요.
      */
-    public static void externalApiError(Logger log, String apiName,
-            int statusCode, long durationMs, Throwable cause) {
+    public static void externalApiError(
+            Logger log,
+            String apiName,
+            int statusCode,
+            long durationMs,
+            Throwable cause) {
         log.atWarn()
                 .addKeyValue(API, apiName)
                 .addKeyValue(STATUS_CODE, statusCode)
@@ -49,12 +60,64 @@ public final class AppLog {
                 .log("External API call failed");
     }
 
-    public static void schedulerCompleted(Logger log, String jobName,
-            int processedCount, long durationMs) {
+    public static void schedulerCompleted(
+            Logger log,
+            String jobName,
+            int processedCount,
+            long durationMs) {
         log.atInfo()
                 .addKeyValue(JOB, jobName)
                 .addKeyValue(PROCESSED_COUNT, processedCount)
                 .addKeyValue(DURATION_MS, durationMs)
                 .log("Scheduler job completed");
+    }
+
+    public static void exceptionDelegated(Logger log, Exception cause) {
+        log.atWarn()
+                .setCause(cause)
+                .log("Exception caught in ExceptionDelegatorFilter, delegating to HandlerExceptionResolver");
+    }
+
+    public static void businessException(
+            Logger log,
+            String errorCode,
+            String errorMessage,
+            int httpStatus,
+            Exception cause) {
+        log.atError()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("errorMessage", errorMessage)
+                .addKeyValue("httpStatus", httpStatus)
+                .setCause(cause)
+                .log("Business exception occurred");
+    }
+
+    public static void validationFailed(Logger log, String errorCode, int violations, String errorMessage) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("violations", violations)
+                .log("Validation failed: {}", errorMessage);
+    }
+
+    public static void methodNotAllowed(Logger log, String errorCode, String method) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("method", method)
+                .log("Method not allowed");
+    }
+
+    public static void resourceNotFound(Logger log, String errorCode, String path) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("path", path)
+                .log("Resource not found");
+    }
+
+    public static void unhandledException(Logger log, String errorCode, Exception cause) {
+        log.atError()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("exceptionType", cause.getClass().getSimpleName())
+                .setCause(cause)
+                .log("Unexpected exception occurred");
     }
 }

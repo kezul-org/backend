@@ -1,0 +1,37 @@
+name: PR Lint
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "Checking PR Title: $TITLE"
+          if [[ ! "$TITLE" =~ ^\[KEZ-[0-9]+\]\ (feat|fix|chore|refactor|docs|test):\ .+$ ]]; then
+            echo "❌ PR Title does not match the convention!"
+            echo "Expected: [KEZ-<number>] <type>: <description>"
+            echo "Types: feat, fix, chore, refactor, docs, test"
+            echo "Example: [KEZ-26] feat: 글로벌 타임존 기준(UTC) 설정 및 Clock 도입"
+            exit 1
+          fi
+          echo "✅ PR Title is valid."
+
+      - name: Check Branch Name
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Checking Branch Name: $BRANCH"
+          if [[ ! "$BRANCH" =~ ^(feat|fix|chore|refactor|docs|test)/KEZ-[0-9]+-.*$ ]]; then
+            echo "❌ Branch Name does not match the convention!"
+            echo "Expected: <type>/KEZ-<number>-<description>"
+            echo "Types: feat, fix, chore, refactor, docs, test"
+            echo "Example: feat/KEZ-28-i18n-infra"
+            exit 1
+          fi
+          echo "✅ Branch Name is valid."

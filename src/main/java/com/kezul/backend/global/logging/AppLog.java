@@ -44,7 +44,7 @@ public final class AppLog {
     }
 
     /**
-     * 외부 API 실패 기록. 이후 AppException으로 변환해서 던지세요.
+     * 외부 API 실패 기록. 이후 KezulException(또는 하위 예외)으로 변환해서 던지세요.
      */
     public static void externalApiError(
             Logger log,
@@ -70,5 +70,54 @@ public final class AppLog {
                 .addKeyValue(PROCESSED_COUNT, processedCount)
                 .addKeyValue(DURATION_MS, durationMs)
                 .log("Scheduler job completed");
+    }
+
+    public static void exceptionDelegated(Logger log, Exception cause) {
+        log.atWarn()
+                .setCause(cause)
+                .log("Exception caught in ExceptionDelegatorFilter, delegating to HandlerExceptionResolver");
+    }
+
+    public static void businessException(
+            Logger log,
+            String errorCode,
+            String errorMessage,
+            int httpStatus,
+            Exception cause) {
+        log.atError()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("errorMessage", errorMessage)
+                .addKeyValue("httpStatus", httpStatus)
+                .setCause(cause)
+                .log("Business exception occurred");
+    }
+
+    public static void validationFailed(Logger log, String errorCode, int violations, String errorMessage) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("violations", violations)
+                .log("Validation failed: {}", errorMessage);
+    }
+
+    public static void methodNotAllowed(Logger log, String errorCode, String method) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("method", method)
+                .log("Method not allowed");
+    }
+
+    public static void resourceNotFound(Logger log, String errorCode, String path) {
+        log.atWarn()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("path", path)
+                .log("Resource not found");
+    }
+
+    public static void unhandledException(Logger log, String errorCode, Exception cause) {
+        log.atError()
+                .addKeyValue("errorCode", errorCode)
+                .addKeyValue("exceptionType", cause.getClass().getSimpleName())
+                .setCause(cause)
+                .log("Unexpected exception occurred");
     }
 }

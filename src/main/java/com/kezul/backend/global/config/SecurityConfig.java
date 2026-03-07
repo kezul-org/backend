@@ -1,37 +1,61 @@
 package com.kezul.backend.global.config;
 
+import com.kezul.backend.global.security.configurer.DomainSecurityConfigurer;
+import com.kezul.backend.global.security.filter.ExceptionDelegatorFilter;
+import com.kezul.backend.global.security.filter.PlatformAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+
+import java.util.List;
 
 /**
- * Spring Security 기본 설정.
- * 현재는 Actuator health 엔드포인트만 허용하고, 나머지는 모두 인증 필요로 막아둡니다.
- * 추후 JWT 필터 및 인증/인가 정책이 auth 모듈에서 추가됩니다.
+ * Spring Security 설정.
+ * JWT 기반 Stateless 인증을 사용하며, 각 도메인의 {@link DomainSecurityConfigurer}가
+ * 자신의 공개/접근 제어 경로를 선언합니다.
  */
+@EnableMethodSecurity
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final ExceptionDelegatorFilter exceptionDelegatorFilter;
+    private final PlatformAuthenticationFilter platformAuthenticationFilter;
+    private final List<DomainSecurityConfigurer> domainSecurityConfigurers;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        auth -> auth
-                                .requestMatchers(
-                                        "/api/actuator/health",
-                                        "/api/actuator/info",
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui/**",
-                                        "/swagger-resources/**")
-                                .permitAll()
-                                .anyRequest().authenticated())
+                        auth -> {
+                            domainSecurityConfigurers.forEach(
+                                    configurer -> configurer.configure(auth));
+                            auth.requestMatchers(
+                                    "/api/actuator/health",
+                                    "/api/actuator/info",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-resources/**")
+                                    .permitAll()
+                                    .anyRequest().authenticated();
+                        })
+                .addFilterBefore(exceptionDelegatorFilter, LogoutFilter.class)
+                .addFilterBefore(
+                        platformAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

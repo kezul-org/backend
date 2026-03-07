@@ -13,10 +13,16 @@ import org.springframework.stereotype.Component;
 import com.kezul.backend.IntegrationTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import com.kezul.backend.global.security.filter.PlatformAuthenticationFilter;
+
 @ApplicationModuleTest
 @IntegrationTest
 @Import(EventIntegrationTest.TestListener.class)
 class EventIntegrationTest {
+
+    @MockitoBean
+    private PlatformAuthenticationFilter platformAuthenticationFilter;
 
     @Autowired
     private TestListener testListener;

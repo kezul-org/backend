@@ -11,8 +11,10 @@ import org.springframework.stereotype.Component;
 import com.kezul.backend.auth.application.port.out.JwtPort;
 import com.kezul.backend.auth.application.port.out.dto.TokenPair;
 import com.kezul.backend.auth.config.JwtProperties;
-import com.kezul.backend.global.error.AppException;
-import com.kezul.backend.global.error.ErrorCode;
+import com.kezul.backend.global.exception.GlobalErrorCode;
+import com.kezul.backend.global.exception.KezulException;
+import com.kezul.backend.auth.exception.AuthErrorCode;
+import com.kezul.backend.auth.exception.AuthException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -38,7 +40,6 @@ public class JwtAdapter implements JwtPort {
         this.jwtProperties = jwtProperties;
         this.clock = clock;
         try {
-            // HS256 requires a secret key of at least 256 bits (32 bytes)
             this.signer = new MACSigner(jwtProperties.getSecretKey());
             this.verifier = new MACVerifier(jwtProperties.getSecretKey());
         } catch (JOSEException e) {
@@ -87,7 +88,7 @@ public class JwtAdapter implements JwtPort {
             return signedJWT.serialize();
         } catch (JOSEException e) {
             log.error("Failed to sign '{}' JWT for user {}", type, userId, e);
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new KezulException(GlobalErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -103,7 +104,6 @@ public class JwtAdapter implements JwtPort {
             if (expirationTime == null) {
                 return false;
             }
-            // token has expired -> Date.from(clock.instant()) is after expirationTime
             if (expirationTime.before(Date.from(clock.instant()))) {
                 log.debug("JWT token expired");
                 return false;
@@ -122,7 +122,7 @@ public class JwtAdapter implements JwtPort {
             verifyTokenSignature(signedJWT);
             return Long.parseLong(signedJWT.getJWTClaimsSet().getSubject());
         } catch (ParseException e) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -133,7 +133,7 @@ public class JwtAdapter implements JwtPort {
             verifyTokenSignature(signedJWT);
             return signedJWT.getJWTClaimsSet().getStringClaim("role");
         } catch (ParseException e) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -144,21 +144,21 @@ public class JwtAdapter implements JwtPort {
             verifyTokenSignature(signedJWT);
             Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             if (expirationTime == null) {
-                throw new AppException(ErrorCode.INVALID_TOKEN);
+                throw new AuthException(AuthErrorCode.INVALID_TOKEN);
             }
             return expirationTime.toInstant();
         } catch (ParseException e) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
         }
     }
 
     private void verifyTokenSignature(SignedJWT signedJWT) {
         try {
             if (!signedJWT.verify(verifier)) {
-                throw new AppException(ErrorCode.INVALID_TOKEN);
+                throw new AuthException(AuthErrorCode.INVALID_TOKEN);
             }
         } catch (JOSEException e) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
         }
     }
 }

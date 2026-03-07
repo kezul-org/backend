@@ -2,7 +2,7 @@ package com.kezul.backend.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kezul.backend.global.error.ErrorCode;
+import com.kezul.backend.global.exception.ErrorCode;
 
 /**
  * 모든 API 응답의 공통 래퍼(Wrapper).

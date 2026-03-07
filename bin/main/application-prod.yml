@@ -1,0 +1,7 @@
+spring:
+  config:
+    import:
+      - classpath:config/database-prod.yml
+      - classpath:config/security-prod.yml
+  flyway:
+    locations: classpath:db/migration

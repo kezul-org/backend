@@ -20,6 +20,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+import com.kezul.backend.global.security.filter.PlatformAuthenticationFilter;
+
 /**
  * 요청마다 JWT Access Token을 검증하고 SecurityContext에 인증 정보를 세팅하는 필터.
  * 토큰이 없으면 pass-through, 있으나 유효하지 않으면 AuthException을 throw합니다.
@@ -27,7 +29,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter implements PlatformAuthenticationFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";

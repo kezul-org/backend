@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Get current branch name
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Skip for system branches
+if [ "$branch" = "main" ] || [ "$branch" = "master" ] || [ "$branch" = "dev" ]; then
+    exit 0
+fi
+
+# Define the regex pattern (basic POSIX format)
+# Note: macOS default bash is v3, avoiding advanced `[[ =~ ]]` for broader compatibility in simple sh scripts,
+# but we can use bash or grep. Let's use grep to be safe.
+if ! echo "$branch" | grep -Eq '^(feat|fix|chore|refactor|docs|test)/KEZ-[0-9]+-.*$'; then
+    echo "❌ 앗! 브랜치 이름 규칙에 맞지 않습니다."
+    echo ""
+    echo "👉 $branch"
+    echo ""
+    echo "올바른 형식: {type}/KEZ-{번호}-{짧은설명}"
+    echo "허용되는 type: feat, fix, chore, refactor, docs, test"
+    echo "예시: feat/KEZ-28-i18n-infra"
+    echo ""
+    echo "브랜치 이름을 변경해 주세요: git branch -m <새이름>"
+    exit 1
+fi
+
+exit 0

@@ -1,8 +1,8 @@
 package com.kezul.backend.global.config;
 
-import com.kezul.backend.auth.adapter.in.filter.JwtAuthenticationFilter;
 import com.kezul.backend.global.security.configurer.DomainSecurityConfigurer;
 import com.kezul.backend.global.security.filter.ExceptionDelegatorFilter;
+import com.kezul.backend.global.security.filter.PlatformAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final ExceptionDelegatorFilter exceptionDelegatorFilter;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final PlatformAuthenticationFilter platformAuthenticationFilter;
     private final List<DomainSecurityConfigurer> domainSecurityConfigurers;
 
     @Bean
@@ -53,7 +53,9 @@ public class SecurityConfig {
                                     .anyRequest().authenticated();
                         })
                 .addFilterBefore(exceptionDelegatorFilter, LogoutFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        platformAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

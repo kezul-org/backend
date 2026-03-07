@@ -34,12 +34,10 @@ public class AuthController {
     private final LogoutUseCase logoutUseCase;
     private final SocialLoginUseCase socialLoginUseCase;
 
-    // =========================================================================
-    // Social Login
-    // =========================================================================
-
-    @Operation(summary = "[Auth] 소셜 로그인", description = "프론트 SDK가 획득한 인가 코드(code)와 소셜 제공자(provider)를 전달하면, "
-            + "백엔드가 해당 소셜 서버에 검증 후 JWT를 발급합니다.")
+    @Operation(summary = "[Auth] 소셜 로그인", description = """
+            프론트 SDK가 획득한 인가 코드(code)와 소셜 제공자(provider)를 전달하면,
+            백엔드가 해당 소셜 서버에 검증 후 JWT를 발급합니다.
+            """)
     @PostMapping("/social-login")
     public ResponseEntity<CommonResponse<TokenResponse>> socialLogin(
             @Valid @RequestBody SocialLoginRequest request,
@@ -49,12 +47,10 @@ public class AuthController {
         return ResponseEntity.ok(CommonResponse.success(TokenResponse.from(tokenPair)));
     }
 
-    // =========================================================================
-    // Token Management
-    // =========================================================================
-
-    @Operation(summary = "[Auth] 토큰 재발급 (RTR)", description = "만료된 Access Token을 갱신하기 위해 Refresh Token을 전송합니다.<br>"
-            + "RTR(Refresh Token Rotation) 정책에 의해 Refresh Token도 함께 새것으로 갱신됩니다.")
+    @Operation(summary = "[Auth] 토큰 재발급 (RTR)", description = """
+            만료된 Access Token을 갱신하기 위해 Refresh Token을 전송합니다.
+            RTR(Refresh Token Rotation) 정책에 의해 Refresh Token도 함께 새것으로 갱신됩니다.
+            """)
     @PostMapping("/reissue")
     public ResponseEntity<CommonResponse<TokenResponse>> reissue(
             @Valid @RequestBody TokenReissueRequest request) {

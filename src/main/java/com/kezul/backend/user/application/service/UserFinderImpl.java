@@ -1,14 +1,9 @@
 package com.kezul.backend.user.application.service;
 
-// <editor-fold desc="[접어두기] TODO: (사용자 학습 4/5) UserFinderImpl 구현체 구현">
-// 왜? UserFinder를 implements 하여 내부 엔티티 조회 및 생성을 담당합니다. UserPort를 주입받으세요.
-// 힌트:
-// 1) findByOauthIdAndProvider: userPort.findByOauthIdAndOauthProvider 조회 후
-// SocialUser로 매핑 (Role.name() 사용)
-// 2) createOauthUser: builder()로 User 엔티티 생성(role은 Role.USER) 후 userPort.save()
-// 저장 결과를 SocialUser로 매핑
-// </editor-fold>
-
+/**
+ * UserFinder 통신 규약의 구체적인 구현체.
+ * User 엔티티 생명주기 및 조회 처리를 담당하며, 외부에는 노출되지 않습니다.
+ */
 import com.kezul.backend.user.SocialUser;
 import com.kezul.backend.user.UserFinder;
 import com.kezul.backend.user.application.port.out.UserPort;

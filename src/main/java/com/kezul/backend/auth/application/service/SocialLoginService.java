@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.kezul.backend.user.SocialUser;
+import com.kezul.backend.user.UserFinder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +20,7 @@ import com.kezul.backend.auth.domain.model.dto.OauthUserInfo;
 import com.kezul.backend.auth.domain.model.entity.RefreshToken;
 import com.kezul.backend.auth.exception.AuthErrorCode;
 import com.kezul.backend.auth.exception.AuthException;
-import com.kezul.backend.user.application.port.out.UserPort;
-import com.kezul.backend.user.domain.model.entity.User;
 import com.kezul.backend.user.domain.model.enums.OauthProvider;
-import com.kezul.backend.user.domain.model.enums.Role;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,18 +33,25 @@ import lombok.extern.slf4j.Slf4j;
 public class SocialLoginService implements SocialLoginUseCase {
 
     private final Map<OauthProvider, OauthClient> oauthClients;
-    private final UserPort userPort;
+    // <editor-fold defaultstate="collapsed" desc="[접어두기] TODO: (사용자 학습 5/5)
+    // UserPort -> UserFinder 로 변경">
+    // 전체 흐름: auth 모듈의 Service 빈을 생성할 때, user 모듈의 내부 구현체(UserPort)가 아닌 공개
+    // 인터페이스(UserFinder)를 주입받도록 의존성을 교체합니다.
+    // 왜? auth 모듈은 user 내부 계층인 UserPort 대신 공개된 UserFinder만 의존해야 합니다.
+    // 필요한 import: com.kezul.backend.user.UserFinder
+    // </editor-fold>
+    private final UserFinder userFinder;
     private final JwtPort jwtPort;
     private final RefreshTokenPort refreshTokenPort;
 
     public SocialLoginService(
             List<OauthClient> oauthClientList,
-            UserPort userPort,
+            UserFinder userFinder,
             JwtPort jwtPort,
             RefreshTokenPort refreshTokenPort) {
         this.oauthClients = oauthClientList.stream()
                 .collect(Collectors.toMap(OauthClient::getProvider, Function.identity()));
-        this.userPort = userPort;
+        this.userFinder = userFinder;
         this.jwtPort = jwtPort;
         this.refreshTokenPort = refreshTokenPort;
     }
@@ -55,12 +61,26 @@ public class SocialLoginService implements SocialLoginUseCase {
     public TokenPair login(SocialLoginCommand command) {
         OauthClient oauthClient = getOauthClient(command.provider());
         OauthUserInfo oauthUserInfo = oauthClient.getUserInfo(command.code());
-        User user = userPort.findByOauthIdAndOauthProvider(oauthUserInfo.oauthId(), oauthUserInfo.provider())
-                .orElseGet(() -> createUser(oauthUserInfo));
-        TokenPair tokenPair = jwtPort.generateTokenPair(user.getId(), user.getRole().name());
+        // <editor-fold defaultstate="collapsed" desc="[접어두기] TODO: (사용자 학습 5/5)
+        // userPort 직접 조회/생성 로직 -> userFinder 사용 로직으로 변경">
+        // 전체 흐름: 소셜 로그인 인증 코드로 획득한 유저 정보를 기반으로, 우리 시스템 내부의 유저를 조회하거나 신규 가입시키는 핵심 비즈니스
+        // 로직입니다.
+        // 왜? User 엔티티 대신 SocialUser DTO를 반환받아 사용함으로써 user 내부 구조와 결합을 끊습니다.
+        // 힌트: userFinder.findByOauthIdAndProvider() 후 orElseGet(() ->
+        // userFinder.createOauthUser(...)) 로 변경
+        // </editor-fold>
+        SocialUser user = userFinder.findByOauthIdAndOauthProvider(oauthUserInfo.oauthId(), oauthUserInfo.provider())
+                .orElseGet(() -> userFinder.createUser(oauthUserInfo.oauthId(), oauthUserInfo.provider()));
+        // <editor-fold defaultstate="collapsed" desc="[접어두기] TODO: (사용자 학습 5/5)
+        // user.getId(), user.getRole().name() -> SocialUser의 id, roleName 필드 사용으로 변경">
+        // 전체 흐름: 토큰 생성 시에 Entity 필드가 아닌 통신용 DTO 객체의 필드를 사용하도록 변경합니다.
+        // 힌트: user.getId() -> socialUser.id(), user.getRole().name() ->
+        // socialUser.roleName()
+        // </editor-fold>
+        TokenPair tokenPair = jwtPort.generateTokenPair(user.id(), user.roleName());
 
         RefreshToken refreshToken = RefreshToken.builder()
-                .userId(user.getId())
+                .userId(user.id())
                 .deviceInfo(command.deviceInfo())
                 .tokenValue(tokenPair.refreshToken())
                 .expiresAt(jwtPort.getExpirationTime(tokenPair.refreshToken()))
@@ -68,22 +88,6 @@ public class SocialLoginService implements SocialLoginUseCase {
         refreshTokenPort.save(refreshToken);
 
         return tokenPair;
-    }
-
-    /**
-     * 신규 유저를 생성합니다.
-     * 닉네임은 "유저_" + UUID 앞 8자리로 자동 생성합니다.
-     */
-    private User createUser(OauthUserInfo oauthUserInfo) {
-        OauthProvider provider = oauthUserInfo.provider();
-        String oauthId = oauthUserInfo.oauthId();
-        User user = User.builder()
-                .oauthProvider(provider)
-                .oauthId(oauthId)
-                .nickname("temp")
-                .role(Role.USER)
-                .build();
-        return userPort.save(user);
     }
 
     private OauthClient getOauthClient(OauthProvider provider) {

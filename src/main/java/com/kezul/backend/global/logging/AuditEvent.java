@@ -19,14 +19,22 @@ package com.kezul.backend.global.logging;
 public enum AuditEvent {
 
     // ── User ─────────────────────────────────────
-    USER_JOINED, USER_WITHDREW, USER_PROFILE_UPDATED,
+    USER_JOINED,
+    USER_WITHDREW,
+    USER_PROFILE_UPDATED,
 
     // ── Auth ─────────────────────────────────────
-    AUTH_LOGIN, AUTH_LOGOUT, AUTH_TOKEN_REFRESHED,
+    AUTH_LOGIN,
+    AUTH_LOGOUT,
+    AUTH_TOKEN_REFRESHED,
 
     // ── Payment (추후 결제 도메인 구현 시 사용) ──
-    PAYMENT_INITIATED, PAYMENT_SUCCEEDED, PAYMENT_FAILED, PAYMENT_CANCELLED,
+    PAYMENT_INITIATED,
+    PAYMENT_SUCCEEDED,
+    PAYMENT_FAILED,
+    PAYMENT_CANCELLED,
 
     // ── Admin ────────────────────────────────────
-    ADMIN_USER_SUSPENDED, ADMIN_USER_FORCE_WITHDREW,
+    ADMIN_USER_SUSPENDED,
+    ADMIN_USER_FORCE_WITHDREW,
 }
